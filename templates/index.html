@@ -1,0 +1,298 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>HardwareHub | Management System</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="layout">
+
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">H</div>
+            <div>
+                <h2>HardwareHub</h2>
+                <small>Management System</small>
+            </div>
+        </div>
+
+        <p class="nav-heading">MAIN MENU</p>
+
+        <a href="#dashboard" class="nav-item active">
+            <span>▦</span> Dashboard
+        </a>
+
+        <a href="#products" class="nav-item">
+            <span>▤</span> Products
+        </a>
+
+        <a href="#inventory" class="nav-item">
+            <span>◫</span> Inventory
+        </a>
+
+        <a href="#sales" class="nav-item">
+            <span>↗</span> Sales Overview
+        </a>
+
+        <div class="sidebar-bottom">
+            <div class="database-status">
+                <span class="status-dot"></span>
+                <div>
+                    <strong>Database</strong>
+                    <small>PostgreSQL</small>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <p class="breadcrumb">Home / Dashboard</p>
+                <h1>Dashboard Overview</h1>
+            </div>
+
+            <div class="admin-badge">
+                <div class="avatar">A</div>
+                <div>
+                    <strong>Administrator</strong>
+                    <small>Hardware Shop</small>
+                </div>
+            </div>
+        </header>
+
+        {% if error %}
+
+        <section class="error-box">
+            <h2>Database connection failed</h2>
+            <p>Check that PostgreSQL is running, the database exists,
+               and the password in app.py is correct.</p>
+            <details>
+                <summary>Technical details</summary>
+                <pre>{{ error }}</pre>
+            </details>
+        </section>
+
+        {% else %}
+
+        <section id="dashboard" class="welcome">
+            <div>
+                <p class="eyebrow">BUSINESS AT A GLANCE</p>
+                <h2>Welcome to your Hardware Shop</h2>
+                <p>Monitor products, stock availability and sales
+                   from one place.</p>
+            </div>
+            <div class="welcome-icon">⌂</div>
+        </section>
+
+        <section class="stats-grid">
+
+            <article class="stat-card">
+                <div class="stat-top">
+                    <span>Total Products</span>
+                    <div class="stat-icon blue">▤</div>
+                </div>
+                <h2>{{ data.products_count }}</h2>
+                <p>Products in inventory</p>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-top">
+                    <span>Categories</span>
+                    <div class="stat-icon purple">▦</div>
+                </div>
+                <h2>{{ data.categories_count }}</h2>
+                <p>Product categories</p>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-top">
+                    <span>Suppliers</span>
+                    <div class="stat-icon orange">♧</div>
+                </div>
+                <h2>{{ data.suppliers_count }}</h2>
+                <p>Registered suppliers</p>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-top">
+                    <span>Low Stock Items</span>
+                    <div class="stat-icon red">!</div>
+                </div>
+                <h2>{{ data.low_stock }}</h2>
+                <p>Items with stock below 15</p>
+            </article>
+
+        </section>
+
+        <section class="overview-grid">
+
+            <article class="info-card" id="inventory">
+                <div class="section-heading">
+                    <div>
+                        <h3>Inventory Valuation</h3>
+                        <p>Estimated value of available stock</p>
+                    </div>
+                    <span class="mini-icon">₹</span>
+                </div>
+
+                <h2 class="money">
+                    ₹{{ "{:,.2f}".format(data.total_stock_value) }}
+                </h2>
+
+                <div class="progress-track">
+                    <div class="progress-fill"></div>
+                </div>
+
+                <p class="small-note">
+                    Calculated using product price × stock quantity.
+                </p>
+            </article>
+
+            <article class="info-card" id="sales">
+                <div class="section-heading">
+                    <div>
+                        <h3>Sales Summary</h3>
+                        <p>Recorded transactions</p>
+                    </div>
+                    <span class="mini-icon">↗</span>
+                </div>
+
+                <h2 class="money">
+                    ₹{{ "{:,.2f}".format(data.sales_amount) }}
+                </h2>
+
+                <div class="sales-details">
+                    <div>
+                        <strong>{{ data.sales_count }}</strong>
+                        <span>Total sales records</span>
+                    </div>
+                    <div>
+                        <strong>PostgreSQL</strong>
+                        <span>Data source</span>
+                    </div>
+                </div>
+            </article>
+
+        </section>
+
+        <section class="table-card" id="products">
+
+            <div class="table-heading">
+                <div>
+                    <h3>Product Inventory</h3>
+                    <p>Products, categories, suppliers and stock status</p>
+                </div>
+
+                <span class="record-badge">
+                    {{ data.products_count }} records
+                </span>
+            </div>
+
+            <div class="search-row">
+                <input
+                    type="search"
+                    id="productSearch"
+                    placeholder="Search product, category or supplier..."
+                    oninput="filterProducts()"
+                    aria-label="Search products">
+                <span class="search-label">Live inventory</span>
+            </div>
+
+            <div class="table-scroll">
+                <table id="productTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Supplier</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for p in data.products %}
+                        <tr>
+                            <td class="id-cell">
+                                #{{ p[0] }}
+                            </td>
+
+                            <td class="product-cell">
+                                <div class="product-symbol">▤</div>
+                                <strong>{{ p[1] }}</strong>
+                            </td>
+
+                            <td>{{ p[2] }}</td>
+                            <td>{{ p[3] }}</td>
+
+                            <td class="price">
+                                ₹{{ "{:,.2f}".format(p[4]) }}
+                            </td>
+
+                            <td>
+                                <span class="stock-number">{{ p[5] }}</span>
+                            </td>
+
+                            <td>
+                                {% if p[5] < 15 %}
+                                    <span class="badge low">Low Stock</span>
+                                {% else %}
+                                    <span class="badge available">In Stock</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="empty-row">
+                                No products found in the database.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-footer">
+                <span>Showing database records</span>
+                <span>Source: products + categories + suppliers</span>
+            </div>
+
+        </section>
+
+        <footer>
+            <span>HardwareHub</span>
+            <span>Database Management System · Academic Project</span>
+        </footer>
+
+        {% endif %}
+
+    </main>
+</div>
+
+<script>
+function filterProducts() {
+    const input = document.getElementById("productSearch");
+    const filter = input.value.toLowerCase();
+    const rows = document.querySelectorAll("#productTable tbody tr");
+
+    rows.forEach(function(row) {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(filter) ? "" : "none";
+    });
+}
+</script>
+
+</body>
+</html>

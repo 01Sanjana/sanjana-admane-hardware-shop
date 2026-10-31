@@ -1,0 +1,123 @@
+
+{% extends "base.html" %}
+{% block title %}Products | HardwareHub{% endblock %}
+{% block heading %}Product Management{% endblock %}
+
+{% block content %}
+<section class="card">
+    <div class="section-heading">
+        <div>
+            <h2>Add New Product</h2>
+            <p class="muted">Enter product details below</p>
+        </div>
+    </div>
+
+    <form action="/products/add" method="POST">
+        <div class="form-grid">
+            <div>
+                <label>Product Name</label>
+                <input name="product_name" required placeholder="Product name">
+            </div>
+            <div>
+                <label>Category</label>
+                <select name="category_id" required>
+                    {% for c in categories %}
+                    <option value="{{ c.category_id }}">{{ c.category_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>Supplier</label>
+                <select name="supplier_id" required>
+                    {% for s in suppliers %}
+                    <option value="{{ s.supplier_id }}">{{ s.supplier_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>Price (₹)</label>
+                <input type="number" name="price" min="0" step="0.01" required>
+            </div>
+            <div>
+                <label>Stock Quantity</label>
+                <input type="number" name="stock_quantity" min="0" required>
+            </div>
+        </div>
+        <button class="btn" type="submit">+ Add Product</button>
+    </form>
+</section>
+
+<section class="table-card">
+    <div class="section-heading">
+        <div>
+            <h2>Product Inventory</h2>
+            <p class="muted">{{ products|length }} products registered</p>
+        </div>
+    </div>
+
+    <input type="search" id="search" placeholder="Search products..." oninput="filterTable()">
+
+    <div class="table-scroll">
+        <table id="productTable">
+            <thead>
+                <tr>
+                    <th>ID</th><th>Product</th><th>Category</th>
+                    <th>Supplier</th><th>Price</th><th>Stock</th><th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for p in products %}
+                <tr>
+                    <td>{{ p.product_id }}</td>
+                    <td>{{ p.product_name }}</td>
+                    <td>{{ p.category_name }}</td>
+                    <td>{{ p.supplier_name }}</td>
+                    <td>₹{{ p.price }}</td>
+                    <td><span class="badge {{ 'low' if p.stock_quantity < 15 else '' }}">{{ p.stock_quantity }}</span></td>
+                    <td>
+                        <details>
+                            <summary style="cursor:pointer;color:#4776e6">Edit</summary>
+                            <form action="/products/edit/{{ p.product_id }}" method="POST">
+                                <label>Name</label>
+                                <input name="product_name" value="{{ p.product_name }}" required>
+                                <label>Category</label>
+                                <select name="category_id">
+                                    {% for c in categories %}
+                                    <option value="{{ c.category_id }}" {% if c.category_id == p.category_id %}selected{% endif %}>{{ c.category_name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label>Supplier</label>
+                                <select name="supplier_id">
+                                    {% for s in suppliers %}
+                                    <option value="{{ s.supplier_id }}" {% if s.supplier_id == p.supplier_id %}selected{% endif %}>{{ s.supplier_name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label>Price</label>
+                                <input type="number" name="price" min="0" step="0.01" value="{{ p.price }}" required>
+                                <label>Stock</label>
+                                <input type="number" name="stock_quantity" min="0" value="{{ p.stock_quantity }}" required>
+                                <button class="btn" type="submit">Save Changes</button>
+                            </form>
+                        </details>
+                        <form action="/products/delete/{{ p.product_id }}" method="POST" onsubmit="return confirm('Delete this product?')">
+                            <button class="btn btn-danger" type="submit">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="7">No products found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<script>
+function filterTable() {
+    const value = document.getElementById("search").value.toLowerCase();
+    document.querySelectorAll("#productTable tbody tr").forEach(row => {
+        row.style.display = row.innerText.toLowerCase().includes(value) ? "" : "none";
+    });
+}
+</script>
+{% endblock %}

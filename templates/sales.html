@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Sales | Hardware Shop{% endblock %}
+{% block heading %}Sales Overview{% endblock %}
+
+{% block content %}
+
+<div class="card">
+    <h3>Sales Records</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Sale ID</th>
+                <th>Customer</th>
+                <th>Product</th>
+                <th>Date</th>
+                <th>Quantity</th>
+                <th>Total Amount</th>
+                <th>Payment Method</th>
+                <th>Payment Status</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for item in sales %}
+            <tr>
+                <td>{{ item.sale_id }}</td>
+                <td>{{ item.customer_name }}</td>
+                <td>{{ item.product_name }}</td>
+                <td>{{ item.sale_date }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>₹{{ item.total_amount }}</td>
+                <td>{{ item.payment_method }}</td>
+                <td>{{ item.payment_status }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="8">No sales records found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

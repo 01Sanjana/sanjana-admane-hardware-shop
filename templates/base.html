@@ -1,0 +1,107 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}HardwareHub{% endblock %}</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f4f6fb; color: #20283a; }
+        .layout { display: flex; min-height: 100vh; }
+        .sidebar { width: 245px; background: #172238; color: white; padding: 25px 16px; position: fixed; height: 100vh; }
+        .brand { display: flex; gap: 12px; align-items: center; margin-bottom: 38px; }
+        .brand-icon { background: #4776e6; padding: 12px; border-radius: 10px; font-weight: bold; }
+        .brand h2 { font-size: 20px; }
+        .brand small { color: #aebbd0; }
+        .nav-heading { color: #8e9bb1; font-size: 11px; margin: 20px 10px 12px; }
+        .nav-item { display: block; padding: 13px 14px; margin: 5px 0; color: #d4dcec; text-decoration: none; border-radius: 8px; }
+        .nav-item:hover, .nav-item.active { background: #30466c; color: white; }
+        .main-content { margin-left: 245px; width: calc(100% - 245px); padding: 30px; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+        .topbar h1 { font-size: 27px; }
+        .breadcrumb { color: #7d8799; font-size: 13px; margin-bottom: 8px; }
+        .admin-badge { background: white; padding: 12px 18px; border-radius: 10px; }
+        .admin-badge small { display: block; color: #7d8799; margin-top: 4px; }
+        .welcome, .card, .table-card { background: white; padding: 24px; border-radius: 13px; margin-bottom: 22px; box-shadow: 0 3px 15px #18263b0b; }
+        .welcome { background: #eaf0ff; }
+        .welcome h2 { margin: 8px 0; }
+        .eyebrow { color: #4776e6; font-size: 12px; font-weight: bold; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin: 22px 0; }
+        .stat-card { background: white; padding: 22px; border-radius: 12px; box-shadow: 0 3px 15px #18263b0b; }
+        .stat-card h2 { font-size: 29px; margin: 15px 0 7px; color: #315fbd; }
+        .stat-card p, .muted { color: #7d8799; font-size: 13px; }
+        .section-heading { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+        .section-heading p { color: #7d8799; font-size: 13px; margin-top: 5px; }
+        .btn { display: inline-block; border: 0; border-radius: 7px; padding: 10px 15px; background: #4776e6; color: white; cursor: pointer; text-decoration: none; font-size: 13px; }
+        .btn-danger { background: #dc4c58; }
+        .btn-secondary { background: #64748b; }
+        input, select, textarea { width: 100%; padding: 11px; border: 1px solid #dce1eb; border-radius: 7px; margin: 7px 0 14px; font: inherit; }
+        label { font-size: 13px; font-weight: bold; }
+        .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        table { width: 100%; border-collapse: collapse; min-width: 650px; }
+        th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid #edf0f5; font-size: 13px; }
+        th { background: #f6f8fc; color: #657087; }
+        .table-scroll { overflow-x: auto; }
+        .badge { padding: 6px 9px; border-radius: 20px; font-size: 11px; background: #e4f7ec; color: #18834c; }
+        .badge.low { background: #fff0dc; color: #b66a11; }
+        .message { padding: 13px; background: #e4f7ec; color: #18834c; border-radius: 8px; margin-bottom: 16px; }
+        .message.error { background: #ffe9e9; color: #bd3434; }
+        footer { color: #8993a5; font-size: 12px; padding: 22px 0; }
+        @media(max-width: 850px) {
+            .sidebar { width: 190px; }
+            .main-content { margin-left: 190px; width: calc(100% - 190px); padding: 18px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media(max-width: 600px) {
+            .sidebar { position: static; width: 100%; height: auto; }
+            .layout { display: block; }
+            .main-content { margin: 0; width: 100%; }
+            .stats-grid, .form-grid { grid-template-columns: 1fr; }
+            .topbar { align-items: flex-start; gap: 12px; flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+<div class="layout">
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">H</div>
+            <div><h2>HardwareHub</h2><small>Management System</small></div>
+        </div>
+        <p class="nav-heading">MAIN MENU</p>
+        <a class="nav-item" href="/">▦ Dashboard</a>
+        <a class="nav-item" href="/products">▤ Products</a>
+        <a class="nav-item" href="/categories">◈ Categories</a>
+        <a class="nav-item" href="/suppliers">♧ Suppliers</a>
+        <a class="nav-item" href="/customers">♙ Customers</a>
+        <a class="nav-item" href="/sales">↗ Sales</a>
+        <p class="nav-heading">CUSTOMER WEBSITE</p>
+        <a class="nav-item" href="/store" target="_blank">🛒 Online Store ↗</a>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div>
+                <p class="breadcrumb">HardwareHub / Management</p>
+                <h1>{% block heading %}Dashboard{% endblock %}</h1>
+            </div>
+            <div class="admin-badge">
+                <strong>Administrator</strong>
+                <small>Hardware Shop</small>
+            </div>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="message {{ 'error' if category == 'error' else '' }}">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+
+        <footer>HardwareHub | Hardware Shop Management System · PostgreSQL</footer>
+    </main>
+</div>
+</body>
+</html>

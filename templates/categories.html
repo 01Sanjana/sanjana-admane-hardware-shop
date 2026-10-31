@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Categories | Hardware Shop{% endblock %}
+{% block heading %}Manage Categories{% endblock %}
+
+{% block content %}
+
+<div class="card">
+    <h3>Add New Category</h3>
+
+    <form method="POST" action="{{ url_for('categories') }}">
+        <label>Category Name</label>
+        <input type="text" name="category_name" placeholder="Enter category name" required>
+
+        <label>Description</label>
+        <textarea name="description" placeholder="Enter description"></textarea>
+
+        <button type="submit">Add Category</button>
+    </form>
+</div>
+
+<div class="card">
+    <h3>All Categories</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Category Name</th>
+                <th>Description</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for item in categories %}
+            <tr>
+                <td>{{ item.category_id }}</td>
+                <td>{{ item.category_name }}</td>
+                <td>{{ item.description or '-' }}</td>
+                <td>
+                    <form method="POST"
+                          action="{{ url_for('delete_category', item_id=item.category_id) }}"
+                          onsubmit="return confirm('Delete this category?')">
+                        <button type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4">No categories found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

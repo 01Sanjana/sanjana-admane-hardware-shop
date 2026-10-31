@@ -1,298 +1,221 @@
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends "base.html" %}
 
-    <title>HardwareHub | Management System</title>
+{% block title %}Dashboard | Hardware Shop{% endblock %}
+{% block heading %}Dashboard Overview{% endblock %}
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
-</head>
+{% block content %}
 
-<body>
+<style>
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 18px;
+        margin-bottom: 22px;
+    }
 
-<div class="layout">
+    .stat-card {
+        padding: 22px;
+        border-radius: 12px;
+        background: var(--card-bg, #ffffff);
+        border: 1px solid var(--border-color, #e5e7eb);
+    }
 
-    <aside class="sidebar">
-        <div class="brand">
-            <div class="brand-icon">H</div>
-            <div>
-                <h2>HardwareHub</h2>
-                <small>Management System</small>
-            </div>
-        </div>
+    .stat-card p {
+        margin: 0 0 10px;
+        color: #777;
+    }
 
-        <p class="nav-heading">MAIN MENU</p>
+    .stat-card h2 {
+        margin: 0;
+        font-size: 28px;
+    }
 
-        <a href="#dashboard" class="nav-item active">
-            <span>▦</span> Dashboard
-        </a>
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 18px;
+        margin-bottom: 22px;
+    }
 
-        <a href="#products" class="nav-item">
-            <span>▤</span> Products
-        </a>
+    .dashboard-card {
+        padding: 22px;
+        border-radius: 12px;
+        background: var(--card-bg, #ffffff);
+        border: 1px solid var(--border-color, #e5e7eb);
+    }
 
-        <a href="#inventory" class="nav-item">
-            <span>◫</span> Inventory
-        </a>
+    .dashboard-card h3 {
+        margin-top: 0;
+    }
 
-        <a href="#sales" class="nav-item">
-            <span>↗</span> Sales Overview
-        </a>
+    .dashboard-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+    }
 
-        <div class="sidebar-bottom">
-            <div class="database-status">
-                <span class="status-dot"></span>
-                <div>
-                    <strong>Database</strong>
-                    <small>PostgreSQL</small>
-                </div>
-            </div>
-        </div>
-    </aside>
+    .dashboard-table th,
+    .dashboard-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #e5e7eb;
+    }
 
-    <main class="main-content">
+    .dashboard-table th {
+        background: #f3f4f6;
+        color: #333;
+    }
 
-        <header class="topbar">
-            <div>
-                <p class="breadcrumb">Home / Dashboard</p>
-                <h1>Dashboard Overview</h1>
-            </div>
+    .dashboard-table tr:hover {
+        background: #f9fafb;
+    }
 
-            <div class="admin-badge">
-                <div class="avatar">A</div>
-                <div>
-                    <strong>Administrator</strong>
-                    <small>Hardware Shop</small>
-                </div>
-            </div>
-        </header>
+    .dashboard-search {
+        width: 100%;
+        max-width: 350px;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ddd;
+        border-radius: 7px;
+    }
 
-        {% if error %}
+    .low-stock {
+        color: #dc2626;
+        font-weight: bold;
+    }
 
-        <section class="error-box">
-            <h2>Database connection failed</h2>
-            <p>Check that PostgreSQL is running, the database exists,
-               and the password in app.py is correct.</p>
-            <details>
-                <summary>Technical details</summary>
-                <pre>{{ error }}</pre>
-            </details>
-        </section>
+    .normal-stock {
+        color: #15803d;
+        font-weight: bold;
+    }
 
-        {% else %}
+    .table-wrapper {
+        overflow-x: auto;
+    }
+</style>
 
-        <section id="dashboard" class="welcome">
-            <div>
-                <p class="eyebrow">BUSINESS AT A GLANCE</p>
-                <h2>Welcome to your Hardware Shop</h2>
-                <p>Monitor products, stock availability and sales
-                   from one place.</p>
-            </div>
-            <div class="welcome-icon">⌂</div>
-        </section>
-
-        <section class="stats-grid">
-
-            <article class="stat-card">
-                <div class="stat-top">
-                    <span>Total Products</span>
-                    <div class="stat-icon blue">▤</div>
-                </div>
-                <h2>{{ data.products_count }}</h2>
-                <p>Products in inventory</p>
-            </article>
-
-            <article class="stat-card">
-                <div class="stat-top">
-                    <span>Categories</span>
-                    <div class="stat-icon purple">▦</div>
-                </div>
-                <h2>{{ data.categories_count }}</h2>
-                <p>Product categories</p>
-            </article>
-
-            <article class="stat-card">
-                <div class="stat-top">
-                    <span>Suppliers</span>
-                    <div class="stat-icon orange">♧</div>
-                </div>
-                <h2>{{ data.suppliers_count }}</h2>
-                <p>Registered suppliers</p>
-            </article>
-
-            <article class="stat-card">
-                <div class="stat-top">
-                    <span>Low Stock Items</span>
-                    <div class="stat-icon red">!</div>
-                </div>
-                <h2>{{ data.low_stock }}</h2>
-                <p>Items with stock below 15</p>
-            </article>
-
-        </section>
-
-        <section class="overview-grid">
-
-            <article class="info-card" id="inventory">
-                <div class="section-heading">
-                    <div>
-                        <h3>Inventory Valuation</h3>
-                        <p>Estimated value of available stock</p>
-                    </div>
-                    <span class="mini-icon">₹</span>
-                </div>
-
-                <h2 class="money">
-                    ₹{{ "{:,.2f}".format(data.total_stock_value) }}
-                </h2>
-
-                <div class="progress-track">
-                    <div class="progress-fill"></div>
-                </div>
-
-                <p class="small-note">
-                    Calculated using product price × stock quantity.
-                </p>
-            </article>
-
-            <article class="info-card" id="sales">
-                <div class="section-heading">
-                    <div>
-                        <h3>Sales Summary</h3>
-                        <p>Recorded transactions</p>
-                    </div>
-                    <span class="mini-icon">↗</span>
-                </div>
-
-                <h2 class="money">
-                    ₹{{ "{:,.2f}".format(data.sales_amount) }}
-                </h2>
-
-                <div class="sales-details">
-                    <div>
-                        <strong>{{ data.sales_count }}</strong>
-                        <span>Total sales records</span>
-                    </div>
-                    <div>
-                        <strong>PostgreSQL</strong>
-                        <span>Data source</span>
-                    </div>
-                </div>
-            </article>
-
-        </section>
-
-        <section class="table-card" id="products">
-
-            <div class="table-heading">
-                <div>
-                    <h3>Product Inventory</h3>
-                    <p>Products, categories, suppliers and stock status</p>
-                </div>
-
-                <span class="record-badge">
-                    {{ data.products_count }} records
-                </span>
-            </div>
-
-            <div class="search-row">
-                <input
-                    type="search"
-                    id="productSearch"
-                    placeholder="Search product, category or supplier..."
-                    oninput="filterProducts()"
-                    aria-label="Search products">
-                <span class="search-label">Live inventory</span>
-            </div>
-
-            <div class="table-scroll">
-                <table id="productTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Product Name</th>
-                            <th>Category</th>
-                            <th>Supplier</th>
-                            <th>Price</th>
-                            <th>Stock</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                    {% for p in data.products %}
-                        <tr>
-                            <td class="id-cell">
-                                #{{ p[0] }}
-                            </td>
-
-                            <td class="product-cell">
-                                <div class="product-symbol">▤</div>
-                                <strong>{{ p[1] }}</strong>
-                            </td>
-
-                            <td>{{ p[2] }}</td>
-                            <td>{{ p[3] }}</td>
-
-                            <td class="price">
-                                ₹{{ "{:,.2f}".format(p[4]) }}
-                            </td>
-
-                            <td>
-                                <span class="stock-number">{{ p[5] }}</span>
-                            </td>
-
-                            <td>
-                                {% if p[5] < 15 %}
-                                    <span class="badge low">Low Stock</span>
-                                {% else %}
-                                    <span class="badge available">In Stock</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                    {% else %}
-                        <tr>
-                            <td colspan="7" class="empty-row">
-                                No products found in the database.
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="table-footer">
-                <span>Showing database records</span>
-                <span>Source: products + categories + suppliers</span>
-            </div>
-
-        </section>
-
-        <footer>
-            <span>HardwareHub</span>
-            <span>Database Management System · Academic Project</span>
-        </footer>
-
-        {% endif %}
-
-    </main>
+{% if error %}
+<div class="card">
+    <h3>Database Connection Error</h3>
+    <p>{{ error }}</p>
+    <p>Check your PostgreSQL connection and try again.</p>
 </div>
 
-<script>
-function filterProducts() {
-    const input = document.getElementById("productSearch");
-    const filter = input.value.toLowerCase();
-    const rows = document.querySelectorAll("#productTable tbody tr");
+{% elif data %}
 
-    rows.forEach(function(row) {
-        const text = row.innerText.toLowerCase();
-        row.style.display = text.includes(filter) ? "" : "none";
+<!-- Statistics -->
+<div class="stats-grid">
+
+    <div class="stat-card">
+        <p>Total Products</p>
+        <h2>{{ data.products_count }}</h2>
+    </div>
+
+    <div class="stat-card">
+        <p>Total Categories</p>
+        <h2>{{ data.categories_count }}</h2>
+    </div>
+
+    <div class="stat-card">
+        <p>Total Suppliers</p>
+        <h2>{{ data.suppliers_count }}</h2>
+    </div>
+
+    <div class="stat-card">
+        <p>Total Customers</p>
+        <h2>{{ data.customers_count }}</h2>
+    </div>
+
+    <div class="stat-card">
+        <p>Low Stock Products</p>
+        <h2>{{ data.low_stock }}</h2>
+    </div>
+
+</div>
+
+<!-- Business Summary -->
+<div class="dashboard-grid">
+
+    <div class="dashboard-card">
+        <h3>Inventory Valuation</h3>
+        <h2>₹{{ "%.2f"|format(data.total_stock_value) }}</h2>
+        <p>Total value of available inventory.</p>
+    </div>
+
+    <div class="dashboard-card">
+        <h3>Sales Summary</h3>
+        <h2>{{ data.sales_count }} Sales</h2>
+        <p>Total Sales Amount</p>
+        <h2>₹{{ "%.2f"|format(data.sales_amount) }}</h2>
+    </div>
+
+</div>
+
+<!-- Product Inventory -->
+<div class="card">
+    <h3>Product Inventory</h3>
+
+    <input
+        type="text"
+        id="productSearch"
+        class="dashboard-search"
+        placeholder="Search products..."
+        onkeyup="searchDashboardProducts()"
+    >
+
+    <div class="table-wrapper">
+        <table class="dashboard-table" id="productTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Supplier</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for p in data.products %}
+                <tr>
+                    <td>{{ p.product_id }}</td>
+                    <td>{{ p.product_name }}</td>
+                    <td>{{ p.category_name }}</td>
+                    <td>{{ p.supplier_name }}</td>
+                    <td>₹{{ p.price }}</td>
+                    <td>{{ p.stock_quantity }}</td>
+
+                    <td>
+                        {% if p.stock_quantity < 15 %}
+                            <span class="low-stock">Low Stock</span>
+                        {% else %}
+                            <span class="normal-stock">Available</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7">No products found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endif %}
+
+<script>
+function searchDashboardProducts() {
+    let input = document.getElementById("productSearch").value.toLowerCase();
+
+    document.querySelectorAll("#productTable tbody tr").forEach(function(row) {
+        row.style.display = row.innerText.toLowerCase().includes(input) ? "" : "none";
     });
 }
 </script>
 
-</body>
-</html>
+{% endblock %}

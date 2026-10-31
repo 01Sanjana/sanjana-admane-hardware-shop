@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Customers | Hardware Shop{% endblock %}
+{% block heading %}Customers{% endblock %}
+
+{% block content %}
+
+<div class="card">
+    <h3>Customer Records</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Customer ID</th>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Address</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for item in customers %}
+            <tr>
+                <td>{{ item.customer_id }}</td>
+                <td>{{ item.customer_name }}</td>
+                <td>{{ item.phone or '-' }}</td>
+                <td>{{ item.email or '-' }}</td>
+                <td>{{ item.address or '-' }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5">No customers found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

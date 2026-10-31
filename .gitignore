@@ -1,4 +1,7 @@
 venv/
+.env
 __pycache__/
 *.pyc
-.env
+app_backup.py
+static/style_backup.css
+templates/index_backup.html

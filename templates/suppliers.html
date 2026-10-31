@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Suppliers | Hardware Shop{% endblock %}
+{% block heading %}Manage Suppliers{% endblock %}
+
+{% block content %}
+
+<div class="card">
+    <h3>Add New Supplier</h3>
+
+    <form method="POST" action="{{ url_for('suppliers') }}">
+        <label>Supplier Name</label>
+        <input type="text" name="supplier_name" placeholder="Enter supplier name" required>
+
+        <label>Phone</label>
+        <input type="text" name="phone" placeholder="Enter phone number">
+
+        <label>Email</label>
+        <input type="email" name="email" placeholder="Enter email">
+
+        <label>Address</label>
+        <textarea name="address" placeholder="Enter address"></textarea>
+
+        <button type="submit">Add Supplier</button>
+    </form>
+</div>
+
+<div class="card">
+    <h3>All Suppliers</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Supplier Name</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Address</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for item in suppliers %}
+            <tr>
+                <td>{{ item.supplier_id }}</td>
+                <td>{{ item.supplier_name }}</td>
+                <td>{{ item.phone or '-' }}</td>
+                <td>{{ item.email or '-' }}</td>
+                <td>{{ item.address or '-' }}</td>
+                <td>
+                    <form method="POST"
+                          action="{{ url_for('delete_supplier', item_id=item.supplier_id) }}"
+                          onsubmit="return confirm('Delete this supplier?')">
+                        <button type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6">No suppliers found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

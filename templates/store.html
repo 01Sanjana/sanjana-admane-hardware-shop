@@ -1,0 +1,232 @@
+
+{% extends "base.html" %}
+
+{% block title %}Online Store | Hardware Shop{% endblock %}
+{% block heading %}Hardware Shop - Online Store{% endblock %}
+
+{% block content %}
+
+<style>
+    .store-product {
+        padding: 20px;
+    }
+
+    .cart-box {
+        margin-top: 25px;
+        padding: 20px;
+        background: white;
+        border-radius: 10px;
+    }
+
+    .cart-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        gap: 10px;
+    }
+
+    .checkout-form input,
+    .checkout-form select {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        box-sizing: border-box;
+    }
+
+    .store-btn {
+        padding: 10px 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        background: #2563eb;
+        color: white;
+    }
+</style>
+
+<div class="card">
+    <h3>Explore Our Products</h3>
+    <input type="text" id="storeSearch"
+           placeholder="Search products..."
+           onkeyup="searchProducts()">
+</div>
+
+<div class="product-grid" id="productGrid">
+
+    {% for item in products %}
+    <div class="card store-product">
+
+        <h3>{{ item.product_name }}</h3>
+
+        <p><strong>Category:</strong> {{ item.category_name }}</p>
+
+        <h2>₹{{ item.price }}</h2>
+
+        {% if item.stock_quantity > 0 %}
+            <p>Available Stock: {{ item.stock_quantity }}</p>
+            <span class="status available">In Stock</span>
+
+            <br><br>
+
+<button class="store-btn"
+    onclick='addToCart(
+        {{ item.product_id }},
+        {{ item.product_name | tojson }},
+        {{ item.price }},
+        {{ item.stock_quantity }}
+    )'>
+    Add to Cart
+</button>
+
+        {% else %}
+            <p>Currently unavailable</p>
+            <span class="status unavailable">Out of Stock</span>
+        {% endif %}
+
+    </div>
+    {% else %}
+    <div class="card">No products available.</div>
+    {% endfor %}
+
+</div>
+
+<div class="cart-box">
+    <h2>🛒 Your Shopping Cart</h2>
+
+    <div id="cartItems">Your cart is empty.</div>
+
+    <h3 id="cartTotal">Total: ₹0</h3>
+
+    <button class="store-btn" onclick="showCheckout()">
+        Proceed to Checkout
+    </button>
+</div>
+
+<div class="cart-box" id="checkoutBox" style="display:none;">
+
+    <h2>Customer Details</h2>
+
+    <form class="checkout-form" method="POST"
+          action="{{ url_for('checkout') }}"
+          onsubmit="return prepareOrder()">
+
+        <input type="text" name="customer_name"
+               placeholder="Full Name" required>
+
+        <input type="text" name="phone"
+               placeholder="Phone Number" required>
+
+        <input type="email" name="email"
+               placeholder="Email Address" required>
+
+        <input type="text" name="address"
+               placeholder="Delivery Address" required>
+
+        <label>Payment Method</label>
+
+        <select name="payment_method" required>
+            <option value="COD">Cash on Delivery</option>
+        </select>
+
+        <input type="hidden" name="cart_items" id="cartData">
+
+        <button type="submit" class="store-btn">
+            Place Order
+        </button>
+
+    </form>
+</div>
+
+<script>
+let cart = [];
+
+function addToCart(id, name, price, stock) {
+    let existing = cart.find(item => item.id === id);
+
+    if (existing) {
+        if (existing.quantity < stock) {
+            existing.quantity++;
+        } else {
+            alert("Maximum available stock reached!");
+        }
+    } else {
+        cart.push({
+            id: id,
+            name: name,
+            price: price,
+            stock: stock,
+            quantity: 1
+        });
+    }
+
+    displayCart();
+}
+
+function displayCart() {
+    let container = document.getElementById("cartItems");
+    let total = 0;
+
+    if (cart.length === 0) {
+        container.innerHTML = "Your cart is empty.";
+    } else {
+        container.innerHTML = "";
+
+        cart.forEach((item, index) => {
+            total += item.price * item.quantity;
+
+            container.innerHTML += `
+                <div class="cart-item">
+                    <span>${item.name} - ₹${item.price}
+                    × ${item.quantity}</span>
+                    <button onclick="removeItem(${index})">
+                        Remove
+                    </button>
+                </div>
+            `;
+        });
+    }
+
+    document.getElementById("cartTotal").innerText =
+        "Total: ₹" + total.toFixed(2);
+}
+
+function removeItem(index) {
+    cart.splice(index, 1);
+    displayCart();
+}
+
+function showCheckout() {
+    if (cart.length === 0) {
+        alert("Please add a product to your cart first.");
+        return;
+    }
+
+    document.getElementById("checkoutBox").style.display = "block";
+    document.getElementById("checkoutBox").scrollIntoView();
+}
+
+function prepareOrder() {
+    if (cart.length === 0) {
+        alert("Your cart is empty!");
+        return false;
+    }
+
+    document.getElementById("cartData").value =
+        JSON.stringify(cart);
+
+    return true;
+}
+
+function searchProducts() {
+    let input = document.getElementById("storeSearch")
+        .value.toLowerCase();
+
+    document.querySelectorAll(".store-product").forEach(card => {
+        let name = card.querySelector("h3").innerText.toLowerCase();
+        card.style.display = name.includes(input) ? "" : "none";
+    });
+}
+</script>
+
+{% endblock %}
